@@ -1,6 +1,8 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+const dotenv = require('dotenv')
+dotenv.config();
 
 const connect = require('./config/database-config');
 
@@ -16,7 +18,8 @@ io.on('connection', (socket) => {
         socket.join(data.roomid);
     });
 
-    socket.on('msg_send', async (data) => {
+    socket.on('msg_send', async(data) => {
+        console.log("meg_send fun")
         console.log(data);
         const chat = await Chat.create({
             roomId: data.roomid,
@@ -33,7 +36,8 @@ io.on('connection', (socket) => {
 app.set('view engine', 'ejs');
 app.use('/', express.static(__dirname + '/public'));
 
-app.get('/chat/:roomid', async (req, res) => {
+app.get('/chat/:roomid', async(req, res) => {
+    console.log("In url")
     const chats = await Chat.find({
         roomId: req.params.roomid
     }).select('content user');
@@ -45,7 +49,7 @@ app.get('/chat/:roomid', async (req, res) => {
     });
 });
 
-server.listen(3000, async () => {
+server.listen(process.env.PORT, async() => {
     console.log('Server started');
     await connect();
     console.log("mongo db connected")
